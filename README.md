@@ -39,26 +39,25 @@ This repository contains a collection of scientific simulations spanning various
 
 ### And More...
 
-## Prerequisites
+## How to use?
 
+### Requirements:
 - Python 3.12
 - Poetry (Dependency Management)
 
-## Installation
-
+### Installation:
 1. Clone the repository
-2. Install Poetry (see POETRY_GUIDE.md)
+2. Install Poetry (see below Poetry usage guide)
 3. Install dependencies:
-   ```bash
-   poetry install
-   ```
+```bash
+poetry install
+```
 
-## Running simulation
-
+### Running a simulation:
 ```bash
 poetry run python simulations/space_mechanics/sun_movement_3d.py
 ```
-
+-------------
 
 
 # Poetry Usage Guide

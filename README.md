@@ -135,7 +135,7 @@ Poetry automatically creates and manages a virtual environment for your project.
 * Specify version constraints
 * Separate dev and production dependencies
   
-####Troubleshooting
+#### Troubleshooting
 `poetry env list`: List virtual environments
 `poetry env remove`: Remove a specific environment
 `poetry config virtualenvs.in-project true`: Create virtualenv in project directory

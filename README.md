@@ -59,7 +59,7 @@ This repository contains a collection of scientific simulations spanning various
 poetry run python simulations/space_mechanics/sun_movement_3d.py
 ```
 
-## Poetry usage
+
 
 # Poetry Usage Guide
 

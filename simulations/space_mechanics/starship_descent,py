@@ -1,0 +1,92 @@
+import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+
+# Constants
+G = 6.67430e-11  # m^3 kg^-1 s^-2
+M = 5.972e24     # kg
+R = 6.371e6      # m
+rho0 = 1.225     # kg/m^3
+H = 8000         # m
+Cd = 0.5
+A = np.pi * (4.5)**2  # m^2
+m = 100000       # kg
+F_thrust = 0  # Assuming no thrust for passive re-entry
+
+# Initial conditions
+r0 = R + 100000  # m
+v0 = 7500         # m/s
+gamma0 = np.radians(-5)  # radians
+
+def deriv(t, y):
+    r, v, gamma = y
+    g = G * M / r**2
+    h = r - R
+    rho = rho0 * np.exp(-h / H) if h >= 0 else 0.0
+    Fd = 0.5 * rho * v**2 * Cd * A
+    drdt = -v * np.sin(gamma)
+    dvdv = -g * np.sin(gamma) - (Fd + F_thrust) / m
+    dgamdt = (g * np.cos(gamma) / v)
+    return [drdt, dvdv, dgamdt]
+
+def event(t, y):
+    r, v, gamma = y
+    h = r - R
+    return h
+
+event.terminal = True
+event.direction = -1  # Detect crossing from above
+
+# Time span for integration
+t_span = (0, 1000)  # seconds
+
+# Solve the ODEs
+sol = solve_ivp(deriv, t_span, [r0, v0, gamma0], events=event, max_step=1)
+
+# Calculate altitude and heat energy
+h = sol.y[0] - R
+v = sol.y[1]
+gamma = sol.y[2]
+rho = rho0 * np.exp(-h / H)
+Fd = 0.5 * rho * v**2 * Cd * A
+
+# Calculate heat energy using numerical integration
+heat_energy = np.zeros_like(sol.t)
+for i in range(1, len(sol.t)):
+    dt = sol.t[i] - sol.t[i-1]
+    heat_energy[i] = heat_energy[i-1] + abs(Fd[i-1] * v[i-1]) * dt
+
+# Plotting
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+plt.plot(sol.t, h / 1000)
+plt.xlabel('Time (s)')
+plt.ylabel('Altitude (km)')
+plt.title('Altitude vs. Time')
+
+plt.subplot(2, 2, 2)
+plt.plot(sol.t, v)
+plt.xlabel('Time (s)')
+plt.ylabel('Velocity (m/s)')
+plt.title('Velocity vs. Time')
+
+plt.subplot(2, 2, 3)
+plt.plot(sol.t, np.degrees(gamma))
+plt.xlabel('Time (s)')
+plt.ylabel('Flight Path Angle (degrees)')
+plt.title('Flight Path Angle vs. Time')
+
+plt.subplot(2, 2, 4)
+plt.plot(sol.t, heat_energy)
+plt.xlabel('Time (s)')
+plt.ylabel('Heat Energy (J)')
+plt.title('Heat Energy vs. Time')
+
+plt.tight_layout()
+plt.show()
+
+# Final values
+print(f"Final Altitude: {h[-1]/1000} km")
+print(f"Final Velocity: {v[-1]} m/s")
+print(f"Final Heat Energy: {heat_energy[-1]} J")
